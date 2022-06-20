@@ -119,20 +119,31 @@ jobs:
           keys: [frontend-scan]
       # Your job code here
       - run:
-          name: Run backend test
+          name: Run frontend scan
           command: |
              # code here
              cd frontend
              npm install
              npm audit --audit-level=critical
 
-#   scan-backend:
-#     docker:
-#       # Docker image here
-#     steps:
-#       # Checkout code from git
-#       # Restore from cache
-#       # Your job code here
+  scan-backend:
+    docker:
+      # Docker image here
+      - image: circleci/node:13.8.0
+    steps:
+      # Checkout code from git
+      - checkout
+      # Restore from cache
+      - restore_cache:
+          keys: [backend-scan]
+      # Your job code here
+      - run:
+          name: Run backend scan
+          command: |
+             # code here
+             cd backend
+             npm install
+             npm audit --audit-level=critical
 
 #   deploy-infrastructure:
 #     docker:
