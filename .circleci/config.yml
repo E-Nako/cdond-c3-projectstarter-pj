@@ -193,24 +193,35 @@ jobs:
       - destroy-environment
        
 
-#   configure-infrastructure:
-#     docker:
-#       # Docker image here that supports Ansible
-#     steps:
-#       # Checkout code from git
-#       # Add ssh keys with fingerprint
-#       # attach workspace
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # Your code here
-#             exit 1
-#       - run:
-#           name: Configure server
-#           command: |
-#             # Your code here
-#             exit 1
-#       # Here's where you will add some code to rollback on failure      
+  configure-infrastructure:
+    docker:
+      # Docker image here that supports Ansible
+      - image: ContentWise/docker-ansible-aws
+    steps:
+      # Checkout code from git
+      - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints: [31:9c:ea:d6:47:7b:6f:55:ba:1a:5e:f1:67:0b:1c:87]
+      # attach workspace
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install dependencies
+          command: |
+            # Your code here
+            apk add --update ansible
+            # pip install awscli
+            # exit 1
+      - run:
+          name: Configure server
+          command: |
+            # Your code here
+            cat ./.circleci/ansible/inventory.txt
+            ansible-playbook -i ./.circleci/ansible/inventory.txt ./.circleci/ansible/configure-server.yml
+            # exit 1
+      # Here's where you will add some code to rollback on failure  
+      - destroy-environment    
 
 #   run-migrations:
 #     docker:
