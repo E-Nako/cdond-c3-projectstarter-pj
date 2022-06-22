@@ -11,18 +11,31 @@
     - ansible_python_interpreter: /usr/bin/python3
     - ansible_host_key_checking: false
     - ansible_stdout_callback: yaml
-
   pre_tasks:
     - name: "wait 600 seconds for target connection to become reachable/usable."
       # Your code here
 
     - name: "install python for Ansible."
       # Your code here
+      become: true
+      shell: |
+        if [ ! -f /usr/bin/python ]; then
+            apt -y update && apt -y install python3; 
+        fi
 
   # Get the environment variables from CircleCI and add to the EC2 instance
   environment:
     - TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION')}}"  
     # Add more env vars here
+    - ENVIRONMENT: "production"
+    - TYPEORM_CONNECTION: "{{ lookup('env','TYPEORM_CONNECTION') }}"
+    - TYPEORM_PORT: "{{ lookup('env','TYPEORM_PORT') }}"
+    - TYPEORM_HOST: "{{ lookup('env','TYPEORM_HOST') }}"
+    - TYPEORM_USERNAME: "{{ lookup('env','TYPEORM_USERNAME') }}"
+    - TYPEORM_PASSWORD: "{{ lookup('env','TYPEORM_PASSWORD') }}"
+    - TYPEORM_DATABASE: "{{ lookup('env','TYPEORM_DATABASE') }}"
+    - TYPEORM_MIGRATIONS: "{{ lookup('env','TYPEORM_MIGRATIONS') }}"
+    - TYPEORM_ENTITIES: "{{ lookup('env','TYPEORM_ENTITIES') }}"
 
   roles:
     # Your code here
