@@ -196,7 +196,7 @@ jobs:
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
-      - image: ContentWise/docker-ansible-aws
+      - image: python:3.7-alpine3.11
     steps:
       # Checkout code from git
       - checkout
@@ -211,7 +211,7 @@ jobs:
           command: |
             # Your code here
             apk add --update ansible
-            # pip install awscli
+            pip install awscli
             # exit 1
       - run:
           name: Configure server
