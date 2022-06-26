@@ -29,7 +29,7 @@ commands:
             SUCCESS=$(curl --insecure https://kvdb.io/K1PfVrsQYT2jJeohcY6Brf/migration_${CIRCLE_WORKFLOW_ID:0:7})
             if(( $SUCCESS==1 )); 
             then
-             cd ~/project/backend
+             cd backend
              npm install
             #  Add revert code here. You can find this in the Getting Started section.
              npm run migrations:revert
@@ -291,8 +291,8 @@ jobs:
             BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} Name=instance-state-name,Values=running --query Reservations[*].Instances[*].PublicIpAddress --no-paginate --output text)
             API_URL="http://${BACKEND_IP}:3030"
             echo $API_URL
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-            # cat frontend/.env
+            echo API_URL="http://${BACKEND_IP}:3030" > frontend/.env
+            cat frontend/.env
             # export API_URL="http://${BACKEND_IP}:3030"
             # echo "${API_URL}"
       - run:
