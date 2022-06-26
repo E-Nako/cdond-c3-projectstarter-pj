@@ -26,7 +26,7 @@ commands:
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = $(curl --insecure https://kvdb.io/K1PfVrsQYT2jJeohcY6Brf/migration_${CIRCLE_WORKFLOW_ID:0:7})
+            SUCCESS=$(curl --insecure https://kvdb.io/K1PfVrsQYT2jJeohcY6Brf/migration_${CIRCLE_WORKFLOW_ID:0:7})
             if(( $SUCCESS==1 )); 
             then
              cd ~/project/backend
@@ -292,7 +292,7 @@ jobs:
             API_URL="http://${BACKEND_IP}:3030"
             echo $API_URL
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-            cat frontend/.env
+            # cat frontend/.env
             # export API_URL="http://${BACKEND_IP}:3030"
             # echo "${API_URL}"
       - run:
