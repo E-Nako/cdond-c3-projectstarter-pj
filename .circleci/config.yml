@@ -23,15 +23,16 @@ commands:
       - run:
           name: Revert migrations
           # Add when this will run
+          when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
+            SUCCESS = $(curl --insecure https://kvdb.io/K1PfVrsQYT2jJeohcY6Brf/migration_${CIRCLE_WORKFLOW_ID:0:7})
             if(( $SUCCESS==1 )); 
             then
-            #  cd ~/project/backend
-            #  npm install
+             cd ~/project/backend
+             npm install
             #  Add revert code here. You can find this in the Getting Started section.
-              exit 1
+             npm run migrations:revert
             fi
             
 jobs:
@@ -270,27 +271,44 @@ jobs:
      # Here's where you will add some code to rollback on failure
       - destroy-environment      
 
-#   deploy-frontend:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#             export API_URL="http://${BACKEND_IP}:3030"
-#             echo "${API_URL}"
-#       - run:
-#           name: Deploy frontend objects
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure      
-                    
+  deploy-frontend:
+    docker:
+      # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
+    steps:
+      # Checkout code from git
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+            yum -y install tar gzip jq npm
+            curl -sL https://rpm.nodesource.com/setup_12.x | bash -
+            yum -y install nodejs
+      - run:
+          name: Get backend url
+          command: |
+            # your code here
+            BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} Name=instance-state-name,Values=running --query Reservations[*].Instances[*].PublicIpAddress --no-paginate --output text)
+            API_URL="http://${BACKEND_IP}:3030"
+            echo $API_URL
+            echo API_URL="http://${BACKEND_IP}:3030" >> "frontend/.env"
+            cat frontend/.env
+            # export API_URL="http://${BACKEND_IP}:3030"
+            # echo "${API_URL}"
+      - run:
+          name: Deploy frontend objects
+          command: |
+            # your code here
+            cd frontend
+            npm i
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+            # npm audit fix --audit-level=critical --force
+            # aws s3 sync ./frontend/dist s3://"udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --debug
+      # Here's where you will add some code to rollback on failure      
+      - destroy-environment
+      - revert-migrations        
 #   deploy-backend:
 #     docker:
 #       # Docker image here that supports Ansible
