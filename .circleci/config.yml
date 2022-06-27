@@ -291,8 +291,17 @@ jobs:
             BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} Name=instance-state-name,Values=running --query Reservations[*].Instances[*].PublicIpAddress --no-paginate --output text)
             API_URL="http://${BACKEND_IP}:3030"
             echo $API_URL
+            echo API_URL="http://${BACKEND_IP}:3030" >> "frontend/.env"
             cd frontend
-            echo API_URL="http://${BACKEND_IP}:3030" > ".env"
+            npm i
+            npm run build
+            npm audit fix --audit-level=critical --force
+
+            # BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} Name=instance-state-name,Values=running --query Reservations[*].Instances[*].PublicIpAddress --no-paginate --output text)
+            # API_URL="http://${BACKEND_IP}:3030"
+            # echo $API_URL
+            # cd frontend
+            # echo API_URL="http://${BACKEND_IP}:3030" > ".env"
             cat .env
             # export API_URL="http://${BACKEND_IP}:3030"
             # echo "${API_URL}"
@@ -300,16 +309,16 @@ jobs:
           name: Deploy frontend objects
           command: |
             # your code here
-            cd frontend
-            npm i
-            npm run build
+            # cd frontend
+            # npm i
+            # npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
             # npm audit fix --audit-level=critical --force
             # aws s3 sync ./frontend/dist s3://"udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --debug
       # Here's where you will add some code to rollback on failure      
       - destroy-environment
-      - revert-migrations        
+      # - revert-migrations        
 #   deploy-backend:
 #     docker:
 #       # Docker image here that supports Ansible
