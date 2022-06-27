@@ -363,7 +363,7 @@ jobs:
           command: |
             # your code here
              cat ./.circleci/ansible/inventory.txt
-            ansible-playbook -i ./.circleci/ansible/inventory.txt ./.circleci/ansible/deploy-backend.yml -vvv
+             ansible-playbook -i ./.circleci/ansible/inventory.txt ./.circleci/ansible/deploy-backend.yml -vvv
       # Here's where you will add some code to rollback on failure
       - destroy-environment
 
