@@ -390,12 +390,10 @@ jobs:
           name: Backend smoke test.
           command: |
             # your code here
-            if curl "${API_URL}/api/status" | grep "ok"
-            then
-                return 0
-            else
-                return 1
-            fi
+            BACKEND_IP=$(tail -1 ./.circleci/ansible/inventory.txt | egrep '[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}')
+            echo ${BACKEND_IP}
+            echo "http://${BACKEND_IP}:3030/api/status"
+            curl "http://${BACKEND_IP}:3030/api/status
       - run:
           name: Frontend smoke test.
           command: |
