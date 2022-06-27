@@ -318,7 +318,7 @@ jobs:
             # aws s3 sync ./frontend/dist s3://"udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --debug
       # Here's where you will add some code to rollback on failure      
       - destroy-environment
-      # - revert-migrations        
+      - revert-migrations        
 #   deploy-backend:
 #     docker:
 #       # Docker image here that supports Ansible
