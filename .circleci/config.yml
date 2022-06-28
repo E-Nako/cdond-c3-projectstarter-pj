@@ -382,28 +382,28 @@ jobs:
             # your code here
             apk add --update curl
             pip install awscli
-      # - run:
-      #     name: Get backend url
-      #     command: |
-      #       # your code here
-      #       BACKEND_IP=$(tail -1 ./.circleci/ansible/inventory.txt | egrep '[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}')
-      #       export API_URL="http://${BACKEND_IP}:3030"
-      #       echo ${API_URL}
-      # - run:
-      #     name: Backend smoke test.
-      #     command: |
-      #       # your code here
-      #       BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} Name=instance-state-name,Values=running --query Reservations[*].Instances[*].PublicIpAddress --no-paginate --output text)
-      #       echo ${BACKEND_IP}
-      #       export API_URL="http://${BACKEND_IP}:3030"
-      #       echo ${API_URL}
-      #       # echo "http://${BACKEND_IP}:3030/api/status"
-      #       if curl "${API_URL}/api/status" | grep "ok"
-      #       then
-      #           return 0
-      #       else
-      #           return 1
-      #       fi
+      - run:
+          name: Get backend url
+          command: |
+            # your code here
+            BACKEND_IP=$(tail -1 ./.circleci/ansible/inventory.txt | egrep '[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}')
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo ${API_URL}
+      - run:
+          name: Backend smoke test.
+          command: |
+            # your code here
+            BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} Name=instance-state-name,Values=running --query Reservations[*].Instances[*].PublicIpAddress --no-paginate --output text)
+            echo ${BACKEND_IP}
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo ${API_URL}
+            # echo "http://${BACKEND_IP}:3030/api/status"
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+                return 0
+            else
+                return 1
+            fi
       #       # curl -s "http://${BACKEND_IP}:3030/api/status"
       - run:
           name: Frontend smoke test.
