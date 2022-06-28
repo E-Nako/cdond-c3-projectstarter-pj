@@ -389,22 +389,22 @@ jobs:
       #       BACKEND_IP=$(tail -1 ./.circleci/ansible/inventory.txt | egrep '[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}')
       #       export API_URL="http://${BACKEND_IP}:3030"
       #       echo ${API_URL}
-      - run:
-          name: Backend smoke test.
-          command: |
-            # your code here
-            BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} Name=instance-state-name,Values=running --query Reservations[*].Instances[*].PublicIpAddress --no-paginate --output text)
-            echo ${BACKEND_IP}
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo ${API_URL}
-            # echo "http://${BACKEND_IP}:3030/api/status"
-            if curl "${API_URL}/api/status" | grep "ok"
-            then
-                return 0
-            else
-                return 1
-            fi
-            # curl -s "http://${BACKEND_IP}:3030/api/status"
+      # - run:
+      #     name: Backend smoke test.
+      #     command: |
+      #       # your code here
+      #       BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} Name=instance-state-name,Values=running --query Reservations[*].Instances[*].PublicIpAddress --no-paginate --output text)
+      #       echo ${BACKEND_IP}
+      #       export API_URL="http://${BACKEND_IP}:3030"
+      #       echo ${API_URL}
+      #       # echo "http://${BACKEND_IP}:3030/api/status"
+      #       if curl "${API_URL}/api/status" | grep "ok"
+      #       then
+      #           return 0
+      #       else
+      #           return 1
+      #       fi
+      #       # curl -s "http://${BACKEND_IP}:3030/api/status"
       - run:
           name: Frontend smoke test.
           command: |
@@ -422,20 +422,38 @@ jobs:
       - destroy-environment
       # - revert-migrations
 
-#   cloudfront-update:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Update cloudfront distribution
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  cloudfront-update:
+    docker:
+      # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+            yum -y install tar gzip
+      - run:
+          name: Retrieve old stack workflow ID 
+          command: |
+            aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --region us-west-2 --no-paginate --output text >> ./.circleci/oldworkflowid.txt
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            # your code here
+            aws cloudformation deploy \
+                  --template-file .circleci/files/cloudfront.yml \
+                  --stack-name InitialStack \
+                  --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
+                  --tags project=udapeople
+            # aws cloudformation update-stack --use-previous-template --stack-name udapeople-cloudfront --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7},UsePreviousValue=false
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/oldworkflowid.txt
+      # Here's where you will add some code to rollback on failure
+      - destroy-environment 
 
 # cleanup:
 #     docker:
