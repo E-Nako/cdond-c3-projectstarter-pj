@@ -1,10 +1,10 @@
 Description: >
   UdaPeople backend stack.
 
-# Parameters:
-#   ID:
-#     Description: Unique identifier.
-#     Type: String
+Parameters:
+  ID:
+    Description: Unique identifier.
+    Type: String
 
 Resources:
   InstanceSecurityGroup:
@@ -20,10 +20,6 @@ Resources:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 9100
-          ToPort: 9100
           CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 9090
