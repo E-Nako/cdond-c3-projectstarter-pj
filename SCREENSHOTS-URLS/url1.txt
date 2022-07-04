@@ -1,8 +1,0 @@
-[URL01]
-https://github.com/E-Nako/cdond-c3-projectstarter
-
-[URL02]PUBLIC URL FOR S3 BUCKET
-
-
-[URL03]- cloudfront
-dmboxjnj5og4s.cloudfront.net
