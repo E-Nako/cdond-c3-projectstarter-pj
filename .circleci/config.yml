@@ -282,12 +282,12 @@ jobs:
           name: Send migration results to kvdb.io
           command: |
             # Your code here
-            curl --insecure https://kvdb.io/K1PfVrsQYT2jJeohcY6Brf/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-            # if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-            # then
-                # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
-                # curl --insecure https://kvdb.io/K1PfVrsQYT2jJeohcY6Brf/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-            # fi
+            # curl --insecure https://kvdb.io/K1PfVrsQYT2jJeohcY6Brf/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            then
+                If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
+                curl --insecure https://kvdb.io/K1PfVrsQYT2jJeohcY6Brf/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+            fi
           
      # Here's where you will add some code to rollback on failure
       - destroy-environment      
@@ -319,14 +319,6 @@ jobs:
             npm run build
             npm audit fix --audit-level=critical --force
 
-            # BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} Name=instance-state-name,Values=running --query Reservations[*].Instances[*].PublicIpAddress --no-paginate --output text)
-            # API_URL="http://${BACKEND_IP}:3030"
-            # echo $API_URL
-            # cd frontend
-            # echo API_URL="http://${BACKEND_IP}:3030" > ".env"
-            cat .env
-            # export API_URL="http://${BACKEND_IP}:3030"
-            # echo "${API_URL}"
       - run:
           name: Deploy frontend objects
           command: |
@@ -457,7 +449,12 @@ jobs:
           name: Update cloudfront distribution
           command: |
             # your code here
-            aws cloudformation update-stack --use-previous-template --stack-name InitialStack --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7},UsePreviousValue=false
+            aws cloudformation deploy \
+                --template-file .circleci/files/cloudfront.yml \
+                --stack-name InitialStack \
+                --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
+                --tags project=udapeople
+            # aws cloudformation update-stack --use-previous-template --stack-name InitialStack --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7},UsePreviousValue=false
       - persist_to_workspace:
           root: ~/
           paths:
