@@ -89,7 +89,8 @@ jobs:
       - checkout
       # Restore from cache
       - restore_cache:
-          keys: [frontend-test]
+          keys: 
+            - frontend-build-1
       # Your job code here
       - run:
           name: Run frontend test
@@ -108,7 +109,8 @@ jobs:
       - checkout
       # Restore from cache
       - restore_cache:
-          keys: [backend-test]
+          keys: 
+            - backend-build-1
       # Your job code here
       - run:
           name: Run backend test
