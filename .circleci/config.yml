@@ -73,6 +73,10 @@ jobs:
           paths: [backend/node_modules]
           key: backend-build
 
+      - save_cache:
+          paths: [backend/dist]
+          key: backend-dist-2
+
   test-frontend:
     docker:
       # Docker image here
