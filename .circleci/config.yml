@@ -282,12 +282,12 @@ jobs:
           name: Send migration results to kvdb.io
           command: |
             # Your code here
-            # curl --insecure https://kvdb.io/K1PfVrsQYT2jJeohcY6Brf/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-            then
-                If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
-                curl --insecure https://kvdb.io/K1PfVrsQYT2jJeohcY6Brf/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-            fi
+            curl --insecure https://kvdb.io/K1PfVrsQYT2jJeohcY6Brf/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+            # if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            # then
+            #     If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
+            #     curl --insecure https://kvdb.io/K1PfVrsQYT2jJeohcY6Brf/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+            # fi
           
      # Here's where you will add some code to rollback on failure
       - destroy-environment      
@@ -313,7 +313,8 @@ jobs:
             BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} Name=instance-state-name,Values=running --query Reservations[*].Instances[*].PublicIpAddress --no-paginate --output text)
             API_URL="http://${BACKEND_IP}:3030"
             echo $API_URL
-            echo API_URL="http://${BACKEND_IP}:3030" >> "frontend/.env"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
             cd frontend
             npm i
             npm run build
@@ -444,14 +445,15 @@ jobs:
       - run:
           name: Retrieve old stack workflow ID 
           command: |
-            aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --region us-east-1 --no-paginate --output text >> ./.circleci/oldworkflowid.txt
+            export OLD_WORKFLOW_ID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --region us-east-1 --no-paginate --output text)
+            echo "Old Workflow ID: $OLD_WORKFLOW_ID"
       - run:
           name: Update cloudfront distribution
           command: |
             # your code here
             aws cloudformation deploy \
                 --template-file .circleci/files/cloudfront.yml \
-                --stack-name InitialStack \
+                --stack-name myiniStack \
                 --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
                 --tags project=udapeople
             # aws cloudformation update-stack --use-previous-template --stack-name InitialStack --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7},UsePreviousValue=false
@@ -460,6 +462,7 @@ jobs:
           paths:
             - project/.circleci/oldworkflowid.txt
       # Here's where you will add some code to rollback on failure
+      - revert-migrations
       - destroy-environment 
 
   cleanup:
