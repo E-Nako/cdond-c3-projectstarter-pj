@@ -129,7 +129,8 @@ jobs:
       - checkout
       # Restore from cache
       - restore_cache:
-          keys: [frontend-scan]
+          keys: 
+            - frontend-build-1
       # Your job code here
       - run:
           name: Scan frontend dependencies
@@ -149,7 +150,8 @@ jobs:
       - checkout
       # Restore from cache
       - restore_cache:
-          keys: [backend-scan]
+          keys: 
+            - backend-build-1
       # Your job code here
       - run:
           name: Scan backend dependencies
