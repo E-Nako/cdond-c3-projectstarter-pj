@@ -451,12 +451,12 @@ jobs:
           name: Update cloudfront distribution
           command: |
             # your code here
-            aws cloudformation deploy \
-                --template-file .circleci/files/cloudfront.yml \
-                --stack-name myfirstStack \
-                --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
-                --tags project=udapeople
-            # aws cloudformation update-stack --use-previous-template --stack-name InitialStack --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7},UsePreviousValue=false
+            # aws cloudformation deploy \
+            #     --template-file .circleci/files/cloudfront.yml \
+            #     --stack-name myfirstStack \
+            #     --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
+            #     --tags project=udapeople
+            aws cloudformation update-stack --use-previous-template --stack-name InitialStack --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7},UsePreviousValue=false
       # Here's where you will add some code to rollback on failure
       - revert-migrations
       - destroy-environment 
