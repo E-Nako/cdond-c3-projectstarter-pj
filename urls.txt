@@ -1,8 +1,8 @@
 [URL01]
-https://github.com/E-Nako/cdond-c3-projectstarter-pj3
+https://github.com/E-Nako/cdond-c3-projectstarter-pj
 
 [URL02]PUBLIC URL FOR S3 BUCKET
-http://udapeople-7ea6706.s3-website-us-east-1.amazonaws.com
+http://udapeople-ef41245.s3-website-us-east-1.amazonaws.com
 
 [URL03]- cloudfront
-dmboxjnj5og4s.cloudfront.net
+d2uqh3ye4hbhgo.cloudfront.net
