@@ -324,9 +324,7 @@ jobs:
           name: Deploy frontend objects
           command: |
             # your code here
-            npm i
-            npm run build
-            aws s3 sync ./frontend/dist s3://"udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
+            aws s3 sync ./frontend/dist s3://"udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --debug
             # cd frontend
             # npm i
             # npm run build
