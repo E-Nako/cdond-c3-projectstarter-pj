@@ -313,23 +313,18 @@ jobs:
             BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} Name=instance-state-name,Values=running --query Reservations[*].Instances[*].PublicIpAddress --no-paginate --output text)
             API_URL="http://${BACKEND_IP}:3030"
             echo $API_URL
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            echo API_URL="http://${BACKEND_IP}:3030" > frontend/.env
             cat frontend/.env
-            # cd frontend
-            # npm i
-            # npm run build
-            # npm audit fix --audit-level=critical --force
+            cd frontend
+            npm i
+            npm run build
+            npm audit fix --audit-level=critical --force
 
       - run:
           name: Deploy frontend objects
           command: |
             # your code here
-            cd frontend
-            npm i
-            npm run build
-            aws s3 cp ./dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-
-            # aws s3 sync ./frontend/dist s3://"udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --debug
+            aws s3 sync ./frontend/dist s3://"udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --debug
             # cd frontend
             # npm i
             # npm run build
