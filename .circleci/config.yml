@@ -387,7 +387,7 @@ jobs:
       # Lightweight Docker image
       - image: python:3.7-alpine3.11
     steps:
-      # Checkout code from git
+      # Checkout code from gi
       - checkout
       - attach_workspace:
           at: .
